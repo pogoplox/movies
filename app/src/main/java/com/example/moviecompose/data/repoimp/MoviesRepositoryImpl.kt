@@ -19,14 +19,21 @@ import javax.inject.Singleton
 class MoviesRepositoryImpl @Inject constructor(
     private val moviesService: ApiService
 ) : MoviesRepository {
+
     override suspend fun getMovies(page: Int): Flow<Results.Response<List<MovieResponse>>>  = flow {
-        delay(2000)
-        emit(moviesService.getMovies(false, page = 1))
+//simular error
+//        if (page == 3){
+//            throw Results.ApiError("xd")
+//        }
+        emit(moviesService.getMovies(false, page = page))
     }
         .catch {
            when (it){
                is HttpException -> {
                    throw Results.ApiError(it.message())
+               }
+               else -> {
+                   throw it
                }
            }
         }
@@ -35,7 +42,3 @@ class MoviesRepositoryImpl @Inject constructor(
         }
         .flowOn(Dispatchers.IO)
 }
-
-
-
-//            emit(moviesService.getMovies(false, page = 1))
