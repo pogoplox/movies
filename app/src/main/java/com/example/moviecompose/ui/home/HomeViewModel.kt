@@ -1,6 +1,7 @@
 package com.example.moviecompose.ui.home
 
 import androidx.lifecycle.ViewModel
+import com.example.moviecompose.data.Results
 import com.example.moviecompose.data.model.MovieResponse
 import com.example.moviecompose.domain.repositories.MoviesRepository
 import com.example.moviecompose.domain.usecase.GetMoviesUseCase
@@ -24,11 +25,13 @@ class HomeViewModel @Inject constructor(
     private val _list: MutableList<MovieResponse> = mutableListOf()
 
     private var page = 1
-    fun getMovies(scope:CoroutineScope) {
+    fun getMovies(scope:CoroutineScope, _page:Int = 0) {
          scope.launch {
-             getMoviesUseCase.invoke(page)
-                 .catch {
-                     MovieUiState.Error(it)
+             getMoviesUseCase.invoke(if (_page> 0) _page else page)
+                 .catch { t ->
+                     _uiState.update {
+                         MovieUiState.Error(t,_list)
+                     }
                  }
                  .collect { apiResponse ->
                      _uiState.update {
@@ -40,11 +43,20 @@ class HomeViewModel @Inject constructor(
          }
 
     }
+    fun reload(){
+        _uiState.update {
+            MovieUiState.Reload
+        }
+    }
 }
+
+
 
 
 sealed class MovieUiState {
     data class Success(val movies: List<MovieResponse>): MovieUiState()
     object Idle: MovieUiState()
-    data class Error(val exception: Throwable): MovieUiState()
+    object Reload: MovieUiState()
+
+    data class Error(val exception: Throwable, val lastMovies:List<MovieResponse>): MovieUiState()
 }
