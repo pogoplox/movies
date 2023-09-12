@@ -50,7 +50,7 @@ fun HomeScreen() {
                 val movies = (uiState as MovieUiState.Success).movies
                 Column {
                     HomeGrid(listState = listState, movies = movies )
-                    if (listState.isScrolledToTheEnd()){
+                    if (listState.isScrolledToTheEnd(15)){
                         LaunchedEffect(key1 = null, block = {
                             viewModel.getMovies(this)
                         })
@@ -80,5 +80,7 @@ fun HomeScreen() {
 }
 
 
-
-fun LazyGridState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount -1
+fun LazyGridState.isScrolledToTheEnd(buffer:Int):Boolean {
+    val lastVisibleItemIndex = (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0)
+    return(lastVisibleItemIndex > (layoutInfo.totalItemsCount - buffer)) && (layoutInfo.totalItemsCount > 1)
+}
