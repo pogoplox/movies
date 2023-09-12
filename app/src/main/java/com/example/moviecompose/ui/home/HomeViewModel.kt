@@ -21,17 +21,21 @@ class HomeViewModel @Inject constructor(
     private val _uiState:MutableStateFlow<MovieUiState> = MutableStateFlow(MovieUiState.Idle)
     val uiState: StateFlow<MovieUiState> get() = _uiState
 
+    private val _list: MutableList<MovieResponse> = mutableListOf()
 
+    private var page = 1
     fun getMovies(scope:CoroutineScope) {
          scope.launch {
-             getMoviesUseCase.invoke()
+             getMoviesUseCase.invoke(page)
                  .catch {
                      MovieUiState.Error(it)
                  }
                  .collect { apiResponse ->
                      _uiState.update {
-                         MovieUiState.Success(apiResponse.response)
+                         _list.addAll(apiResponse.response)
+                         MovieUiState.Success(_list)
                      }
+                     page += 1
                  }
          }
 

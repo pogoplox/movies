@@ -20,8 +20,8 @@ class MoviesRepositoryImpl @Inject constructor(
     private val moviesService: ApiService
 ) : MoviesRepository {
     override suspend fun getMovies(page: Int): Flow<Results.Response<List<MovieResponse>>>  = flow {
-        delay(2000)
-        emit(moviesService.getMovies(false, page = 1))
+      //  delay(2000)
+        emit(moviesService.getMovies(false, page = page))
     }
         .catch {
            when (it){

@@ -1,5 +1,6 @@
 package com.example.moviecompose.ui.home
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -70,6 +72,13 @@ fun HomeScreen() {
                         }
                     )
 
+                    if (listState.isScrolledToTheEnd()){
+                        LaunchedEffect(key1 = null, block = {
+                            viewModel.getMovies(this)
+                        })
+                    }
+
+
                 }
 
             }
@@ -85,3 +94,5 @@ fun HomeScreen() {
 }
 
 
+
+fun LazyGridState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
